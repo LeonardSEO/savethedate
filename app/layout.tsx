@@ -1,0 +1,109 @@
+import type React from "react"
+import type { Metadata } from "next"
+import { Playfair_Display } from "next/font/google"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import { Analytics } from "@vercel/analytics/next"
+import { Suspense } from "react"
+import "./globals.css"
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+})
+
+export const metadata: Metadata = {
+  title: "Save the Date - Leonard & Thirza | 12 juni 2026",
+  description:
+    "Bewaar 12 juni 2026 voor de bruiloft van Leonard & Thirza in Nieuw-Lekkerland. Officiële uitnodiging volgt later.",
+  generator: "v0.app",
+  robots: "noindex, nofollow",
+  openGraph: {
+    title: "Save the Date - Leonard & Thirza",
+    description: "Bewaar 12 juni 2026 | Officiële uitnodiging volgt later",
+    images: [
+      {
+        url: "/og-save-the-date-new.png",
+        width: 1200,
+        height: 630,
+        alt: "Save the Date - Leonard & Thirza - 12 juni 2026",
+      },
+    ],
+    type: "website",
+    locale: "nl_NL",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Save the Date - Leonard & Thirza",
+    description: "Bewaar 12 juni 2026 | Officiële uitnodiging volgt later",
+    images: ["/og-save-the-date-new.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/clearer-golden-heart.png", sizes: "32x32", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/clearer-golden-heart.png",
+    apple: [
+      { url: "/clearer-golden-heart.png", sizes: "180x180", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "152x152", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "144x144", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "120x120", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "114x114", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "76x76", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "72x72", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "60x60", type: "image/png" },
+      { url: "/clearer-golden-heart.png", sizes: "57x57", type: "image/png" },
+    ],
+  },
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "Save the Date",
+    "theme-color": "#f8f6f0",
+    "msapplication-TileColor": "#f8f6f0",
+    "msapplication-config": "none",
+  },
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="nl">
+      <head>
+        <link rel="mask-icon" href="/clearer-golden-heart.png" color="#d1a954" />
+        <meta name="theme-color" content="#f8f6f0" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Event",
+              name: "Bruiloft Leonard & Thirza", // Updated name order to Leonard & Thirza
+              startDate: "2026-06-12",
+              location: {
+                "@type": "Place",
+                name: "Nieuw-Lekkerland",
+                address: {
+                  "@type": "PostalAddress",
+                  addressLocality: "Nieuw-Lekkerland",
+                  addressCountry: "NL",
+                },
+              },
+              description: "Save the Date voor de bruiloft van Leonard & Thirza. Officiële uitnodiging volgt later.", // Updated name order to Leonard & Thirza
+              eventStatus: "https://schema.org/EventScheduled",
+            }),
+          }}
+        />
+      </head>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
+        <Suspense fallback={null}>{children}</Suspense>
+        <Analytics />
+      </body>
+    </html>
+  )
+}
