@@ -76,7 +76,10 @@ export default function RootLayout({
     <html lang="nl">
       <head>
         <link rel="mask-icon" href="/clearer-golden-heart.png" color="#d1a954" />
-        <meta name="theme-color" content="#f8f6f0" />
+        <link rel="preload" as="image" href="/envelop-start-frame.png" fetchPriority="high" />
+        <link rel="preload" as="video" href="/kling_video.mp4" type="video/mp4" />
+        <meta name="color-scheme" content="light" />
+        <meta name="theme-color" content="#faf9f6" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
