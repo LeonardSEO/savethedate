@@ -337,26 +337,31 @@ export function SaveTheDatePage() {
     const video = introVideoRef.current
     if (video) {
       video.currentTime = 0
-      video.play().catch(() => {
-        // Playback might fail on some devices; continue the reveal anyway.
-      })
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            introFadeTimeoutRef.current = window.setTimeout(() => {
+              setIntroStatus("fading")
+            }, INTRO_FADE_START_MS)
+
+            introPaperTimeoutRef.current = window.setTimeout(() => {
+              setIntroStatus("paper")
+            }, INTRO_FADE_START_MS + INTRO_VIDEO_FADE_MS)
+
+            introRevealTimeoutRef.current = window.setTimeout(() => {
+              setIntroStatus("revealing")
+            }, INTRO_FADE_START_MS + INTRO_VIDEO_FADE_MS + INTRO_PAPER_PAUSE_MS)
+
+            introDoneTimeoutRef.current = window.setTimeout(() => {
+              setIntroStatus("done")
+            }, INTRO_END_MS)
+          })
+          .catch(() => {
+            setIntroStatus("done")
+          })
+      }
     }
-
-    introFadeTimeoutRef.current = window.setTimeout(() => {
-      setIntroStatus("fading")
-    }, INTRO_FADE_START_MS)
-
-    introPaperTimeoutRef.current = window.setTimeout(() => {
-      setIntroStatus("paper")
-    }, INTRO_FADE_START_MS + INTRO_VIDEO_FADE_MS)
-
-    introRevealTimeoutRef.current = window.setTimeout(() => {
-      setIntroStatus("revealing")
-    }, INTRO_FADE_START_MS + INTRO_VIDEO_FADE_MS + INTRO_PAPER_PAUSE_MS)
-
-    introDoneTimeoutRef.current = window.setTimeout(() => {
-      setIntroStatus("done")
-    }, INTRO_END_MS)
   }
 
   useEffect(() => {
@@ -535,8 +540,10 @@ export function SaveTheDatePage() {
             ref={introVideoRef}
             className={`intro-video ${introStatus === "fading" || introStatus === "paper" || introStatus === "revealing" ? "is-fading" : ""}`}
             playsInline
+            webkit-playsinline="true"
             preload="auto"
             muted
+            poster="/envelop-start-frame.png"
           >
             <source src="/kling_video.mp4" type="video/mp4" />
           </video>
