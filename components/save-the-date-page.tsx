@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { ComponentType } from "react"
-const INTRO_FADE_START_MS = 1600
+const INTRO_FADE_START_MS = 3000
 const INTRO_VIDEO_FADE_MS = 500
 const INTRO_PAPER_PAUSE_MS = 150
 const INTRO_LAYER_FADE_MS = 500
@@ -45,7 +45,7 @@ export function SaveTheDatePage() {
 
     const preloadIntroVideo = async () => {
       try {
-        const response = await fetch("/kling_video.mp4")
+        const response = await fetch("/kling_video2.mp4")
         if (!response.ok) {
           throw new Error("Failed to preload intro video")
         }
@@ -56,7 +56,7 @@ export function SaveTheDatePage() {
         setIntroVideoSrc(url)
       } catch {
         if (!cancelled) {
-          setIntroVideoSrc("/kling_video.mp4")
+          setIntroVideoSrc("/kling_video2.mp4")
         }
       }
     }
@@ -149,9 +149,9 @@ export function SaveTheDatePage() {
             webkit-playsinline="true"
             preload="metadata"
             muted
-            poster="/envelop-start-frame.png"
+            poster="/envelop-start-frame2.png"
           >
-            <source src={introVideoSrc ?? "/kling_video.mp4"} type="video/mp4" />
+            <source src={introVideoSrc ?? "/kling_video2.mp4"} type="video/mp4" />
           </video>
           <div
             className={`intro-hit ${introStatus === "idle" ? "" : "is-hidden"}`}
@@ -464,6 +464,12 @@ export function SaveTheDatePage() {
           color: rgba(255, 255, 255, 0.7);
         }
 
+        @media (max-width: 640px) {
+          .countdown-grid {
+            margin-top: clamp(14rem, 38vh, 30rem);
+          }
+        }
+
         .section-title {
           font-size: clamp(1.8rem, 3.4vw, 2.7rem);
           line-height: 1.2;
@@ -483,11 +489,14 @@ export function SaveTheDatePage() {
 
         .timeline {
           position: relative;
-          display: grid;
-          gap: 1.2rem;
           --timeline-time: 84px;
           --timeline-icon: 40px;
           --timeline-gap: 0.9rem;
+        }
+
+        .timeline-items {
+          display: grid;
+          gap: 1.2rem;
         }
 
         .timeline-section,
@@ -499,28 +508,28 @@ export function SaveTheDatePage() {
         .timeline-section .container,
         .location-section .container {
           position: relative;
-          z-index: 1;
+          z-index: 10;
         }
 
         .polaroid-bg {
           position: absolute;
           width: min(260px, 55vw);
-          opacity: 0.4;
+          opacity: 0.35;
           filter: saturate(0.9);
           z-index: 0;
           pointer-events: none;
         }
 
         .polaroid-bg-top {
-          top: 40px;
-          right: -30px;
-          transform: rotate(6deg);
+          top: 10px;
+          right: -50px;
+          transform: rotate(5deg);
         }
 
         .polaroid-bg-bottom {
-          bottom: 20px;
-          right: -30px;
-          transform: rotate(-8deg);
+          bottom: -140px;
+          right: 10px;
+          transform: rotate(-10deg);
         }
 
         .timeline-line {
@@ -695,6 +704,174 @@ export function SaveTheDatePage() {
           color: var(--muted);
         }
 
+        .footer-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          color: var(--accent-dark);
+          margin-bottom: 0.75rem;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+        }
+
+        .practical-section {
+          padding-top: 2rem;
+        }
+
+        .practical-grid {
+          display: grid;
+          gap: 2rem;
+          padding: 1.5rem 0;
+          border-top: 1px solid rgba(201, 176, 122, 0.2);
+          border-bottom: 1px solid rgba(201, 176, 122, 0.2);
+          align-items: start;
+        }
+
+        .practical-item {
+          display: grid;
+          gap: 0.5rem;
+        }
+
+        .practical-label {
+          font-size: 0.75rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--accent-dark);
+          font-weight: 600;
+        }
+
+        .practical-text {
+          color: var(--muted);
+          font-size: 0.95rem;
+        }
+
+        .practical-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-size: 0.98rem;
+          color: var(--ink);
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          align-self: start;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .gift-popover {
+          margin-top: 0.5rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.35rem;
+          padding: 0.55rem 0.7rem;
+          min-width: 72px;
+          min-height: 44px;
+          border-radius: 999px;
+          border: 1px solid rgba(201, 176, 122, 0.25);
+          background: rgba(255, 255, 255, 0.9);
+          box-shadow: 0 10px 24px rgba(15, 10, 5, 0.12);
+          opacity: 0;
+          transform: translateY(-4px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          pointer-events: none;
+        }
+
+        .practical-item:hover .gift-popover {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .gift-popover.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
+        }
+
+        .gift-icon {
+          width: 18px;
+          height: 18px;
+          color: var(--accent-dark);
+        }
+
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(10, 10, 10, 0.45);
+          display: grid;
+          place-items: center;
+          z-index: 9999;
+          padding: 1.5rem;
+        }
+
+        .modal-card {
+          background: #fff;
+          color: var(--ink);
+          border-radius: 24px;
+          padding: 2rem;
+          max-width: 480px;
+          width: 100%;
+          max-height: 80vh;
+          overflow: auto;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+          display: grid;
+          gap: 1rem;
+        }
+
+        .modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+
+        .modal-title {
+          font-size: 1.6rem;
+        }
+
+        .modal-close {
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #fff;
+          cursor: pointer;
+        }
+
+        .modal-intro {
+          color: var(--muted);
+        }
+
+        .modal-contacts {
+          display: grid;
+          gap: 0.4rem;
+        }
+
+        .modal-link {
+          color: var(--ink);
+          font-weight: 600;
+          text-decoration: none;
+        }
+
+        .modal-note {
+          color: var(--muted);
+          font-size: 0.9rem;
+          font-style: italic;
+        }
+
+        @media (min-width: 768px) {
+          .practical-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 3rem;
+          }
+        }
+
         [data-reveal] {
           opacity: 0;
           transform: translateY(18px);
@@ -712,10 +889,6 @@ export function SaveTheDatePage() {
             --timeline-icon: 52px;
             --timeline-gap: 1.4rem;
           }
-
-          .timeline-item {
-            gap: var(--timeline-gap);
-          }
         }
 
         @media (min-width: 1024px) {
@@ -725,13 +898,13 @@ export function SaveTheDatePage() {
           }
 
           .polaroid-bg-top {
-            right: -10px;
-            top: 20px;
+            right: -50px;
+            top: 10px;
           }
 
           .polaroid-bg-bottom {
-            right: -10px;
-            bottom: 10px;
+            right: 10px;
+            bottom: -200px;
           }
         }
 

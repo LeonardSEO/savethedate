@@ -17,7 +17,16 @@ export const metadata: Metadata = {
   description:
     "Bewaar 12 juni 2026 voor de bruiloft van Leonard & Thirza in Nieuw-Lekkerland. Officiële uitnodiging volgt later.",
   generator: "v0.app",
-  robots: "noindex, nofollow",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    noimageindex: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
   openGraph: {
     title: "Save the Date - Leonard & Thirza",
     description: "Bewaar 12 juni 2026 | Officiële uitnodiging volgt later",
@@ -75,31 +84,9 @@ export default function RootLayout({
     <html lang="nl">
       <head>
         <link rel="mask-icon" href="/clearer-golden-heart.png" color="#d1a954" />
-        <link rel="preload" as="image" href="/envelop-start-frame.png" fetchPriority="high" />
+        <link rel="preload" as="image" href="/envelop-start-frame2.png" fetchPriority="high" />
         <meta name="color-scheme" content="light" />
         <meta name="theme-color" content="#faf9f6" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Event",
-              name: "Bruiloft Leonard & Thirza", // Updated name order to Leonard & Thirza
-              startDate: "2026-06-12",
-              location: {
-                "@type": "Place",
-                name: "Nieuw-Lekkerland",
-                address: {
-                  "@type": "PostalAddress",
-                  addressLocality: "Nieuw-Lekkerland",
-                  addressCountry: "NL",
-                },
-              },
-              description: "Save the Date voor de bruiloft van Leonard & Thirza. Officiële uitnodiging volgt later.", // Updated name order to Leonard & Thirza
-              eventStatus: "https://schema.org/EventScheduled",
-            }),
-          }}
-        />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
         <Suspense fallback={null}>{children}</Suspense>

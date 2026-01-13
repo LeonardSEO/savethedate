@@ -1,27 +1,25 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import type { LucideIcon } from "lucide-react"
 import {
   ArrowUp,
   Calendar,
-  Camera,
-  Car,
-  CakeSlice,
+  Banknote,
   Church,
-  Clock,
   DoorOpen,
-  Hand,
+  Mail,
   MapPin,
   Moon,
-  PartyPopper,
-  Scroll,
-  Sparkles,
-  UtensilsCrossed,
+  PenTool,
+  Star,
+  Utensils,
   Users,
   Volume2,
   VolumeX,
+  Wine,
 } from "lucide-react"
 
 const SAVE_THE_DATE = "2026-06-12"
@@ -39,20 +37,14 @@ const SHOW_LEGACY_SAVE_THE_DATE = false
 const COUNTDOWN_TARGET = `${SAVE_THE_DATE}T12:00:00`
 
 const TIMELINE_ITEMS: { time: string; title: string; icon: LucideIcon }[] = [
-  { time: "12:00 - 12:15", title: "Ontvangst gasten op locatie", icon: DoorOpen },
-  { time: "12:15 - 12:30", title: "Inloop en plaatsnemen", icon: Users },
-  { time: "12:30 - 13:30", title: "Burgerlijke ceremonie", icon: Scroll },
-  { time: "13:30 - 14:05", title: "Taart & Borrel", icon: CakeSlice },
-  { time: "14:05 - 14:35", title: "Groepsfoto’s", icon: Camera },
-  { time: "14:35 - 14:45", title: "Rustmoment & vertrek", icon: Clock },
-  { time: "14:45 - 15:30", title: "Rit naar de kerk", icon: Car },
-  { time: "15:30 - 17:30", title: "Kerkdienst & felicitaties", icon: Church },
-  { time: "17:30 - 18:00", title: "Rit terug naar locatie", icon: Car },
-  { time: "18:00 - 18:15", title: "Opfrissen / pauze", icon: Sparkles },
-  { time: "18:15 - 20:15", title: "Diner met speeches", icon: UtensilsCrossed },
-  { time: "20:15 - 20:30", title: "Inloop avondgasten", icon: Moon },
-  { time: "20:30 - 23:30", title: "Avondceremonie / feest", icon: PartyPopper },
-  { time: "23:30 - 00:00", title: "Afsluiten & uitzwaaien", icon: Hand },
+  { time: "12:00", title: "Ontvangst", icon: DoorOpen },
+  { time: "12:30", title: "Burgerlijk Huwelijk", icon: PenTool },
+  { time: "13:30", title: "Taart & Toost", icon: Wine },
+  { time: "15:30", title: "Kerkelijke Inzegening", icon: Church },
+  { time: "18:15", title: "Diner", icon: Utensils },
+  { time: "20:15", title: "Ontvangst avondgasten", icon: Users },
+  { time: "20:30", title: "Avondceremonie", icon: Star },
+  { time: "23:30", title: "Einde", icon: Moon },
 ]
 
 const formatCountdownValue = (value: number) => String(value).padStart(2, "0")
@@ -269,6 +261,9 @@ export function WeddingContent({ visible }: WeddingContentProps) {
   const heroVideoRef = useRef<HTMLVideoElement>(null)
   const kissVideoRef = useRef<HTMLVideoElement>(null)
   const [heroMuted, setHeroMuted] = useState(true)
+  const [isCeremonyModalOpen, setIsCeremonyModalOpen] = useState(false)
+  const [isGiftPopoverOpen, setIsGiftPopoverOpen] = useState(false)
+  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null)
   const [reduceMotion, setReduceMotion] = useState(false)
   const [calendarType, setCalendarType] = useState<"google" | "ics" | "outlook">("google")
   const [calendarLabel, setCalendarLabel] = useState("Zet in mijn agenda")
@@ -291,6 +286,30 @@ export function WeddingContent({ visible }: WeddingContentProps) {
   const dateStamp = SAVE_THE_DATE.replace(/-/g, "")
   const startUtcStamp = `${dateStamp}${EVENT_START_UTC}`
   const endUtcStamp = `${dateStamp}${EVENT_END_UTC}`
+
+  useEffect(() => {
+    setModalRoot(document.body)
+  }, [])
+
+  useEffect(() => {
+    if (!isCeremonyModalOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [isCeremonyModalOpen])
+
+  useEffect(() => {
+    if (!isCeremonyModalOpen) return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsCeremonyModalOpen(false)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isCeremonyModalOpen])
 
   useEffect(() => {
     const detectDevice = () => {
@@ -388,6 +407,19 @@ export function WeddingContent({ visible }: WeddingContentProps) {
     return () => observer.disconnect()
   }, [visible, reduceMotion])
 
+  useEffect(() => {
+    const video = heroVideoRef.current
+    if (!video) return
+    if (!visible) {
+      video.pause()
+      return
+    }
+    if (reduceMotion) return
+    video.play().catch(() => {
+      // Ignore autoplay failures; user can start via sound toggle.
+    })
+  }, [reduceMotion, visible])
+
   const handleAddToCalendar = () => {
     const eventData = {
       title: "Leonard & Thirza trouwen",
@@ -465,7 +497,7 @@ export function WeddingContent({ visible }: WeddingContentProps) {
             <video
               ref={heroVideoRef}
               className="hero-video"
-              autoPlay={!reduceMotion}
+              autoPlay={!reduceMotion && visible}
               muted={heroMuted}
               loop
               playsInline
@@ -526,9 +558,7 @@ export function WeddingContent({ visible }: WeddingContentProps) {
                 </video>
               </div>
               <div className="space-y-4" data-reveal>
-                <p className="eyebrow text-accent">Save the Date</p>
-                <h2 className="section-title font-serif">Samen vieren</h2>
-                <p className="section-subtitle text-muted">We kijken ernaar uit om deze dag met jullie te vieren.</p>
+                <h2 className="section-title font-serif">12 juni 2026</h2>
               </div>
             </div>
           </section>
@@ -538,23 +568,23 @@ export function WeddingContent({ visible }: WeddingContentProps) {
             <img src="/poloroid2.png" alt="" aria-hidden="true" className="polaroid-bg polaroid-bg-bottom" />
             <div className="container">
               <div className="section-header" data-reveal>
-                <p className="eyebrow text-accent">The Big Day</p>
-                <h2 className="section-title font-serif">Dagprogramma</h2>
-                <p className="section-subtitle text-muted">Een zachte leidraad voor de dag. Tijden kunnen iets schuiven.</p>
+                <h2 className="section-title font-serif">Programma</h2>
               </div>
               <div className="timeline">
                 <span className="timeline-line" aria-hidden="true" />
-                {TIMELINE_ITEMS.map((item) => (
-                  <div key={item.time} className="timeline-item" data-reveal>
-                    <div className="timeline-time">{item.time}</div>
-                    <div className="timeline-icon">
-                      <item.icon className="h-5 w-5" />
+                <div className="timeline-items">
+                  {TIMELINE_ITEMS.map((item) => (
+                    <div key={item.time} className="timeline-item" data-reveal>
+                      <div className="timeline-time">{item.time}</div>
+                      <div className="timeline-icon">
+                        <item.icon className="h-5 w-5" />
+                      </div>
+                      <div className="timeline-content">
+                        <h3 className="timeline-title">{item.title}</h3>
+                      </div>
                     </div>
-                    <div className="timeline-content">
-                      <h3 className="timeline-title">{item.title}</h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </section>
@@ -590,18 +620,51 @@ export function WeddingContent({ visible }: WeddingContentProps) {
             </div>
           </section>
 
+          <section className="section practical-section">
+            <div className="container">
+              <div className="practical-grid" data-reveal>
+                <div className="practical-item">
+                  <p className="practical-label">Dresscode</p>
+                  <p className="practical-text">Mannen: Blauw en/of Beige</p>
+                  <p className="practical-text">Vrouwen: Pastelkleuren</p>
+                </div>
+                <div
+                  className="practical-item"
+                  onMouseEnter={() => setIsGiftPopoverOpen(true)}
+                  onMouseLeave={() => setIsGiftPopoverOpen(false)}
+                >
+                  <p className="practical-label">Cadotip</p>
+                  <button
+                    type="button"
+                    className="practical-link"
+                    onClick={() => setIsGiftPopoverOpen((prev) => !prev)}
+                    aria-expanded={isGiftPopoverOpen}
+                    aria-haspopup="dialog"
+                  >
+                    Wensen
+                  </button>
+                  <div
+                    className={`gift-popover ${isGiftPopoverOpen ? "is-visible" : ""}`}
+                    role="note"
+                    aria-hidden={!isGiftPopoverOpen}
+                  >
+                    <Mail className="gift-icon" />
+                    <Banknote className="gift-icon" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section className="section cta-section">
             <div className="container">
               <div className="cta-card" data-reveal>
-                <p className="eyebrow text-accent">Save the Date</p>
-                <h2 className="section-title font-serif">We kunnen niet wachten</h2>
-                <p className="section-subtitle text-muted">
-                  We kunnen niet wachten om dit met jullie te vieren. Zet de datum alvast in je agenda.
-                </p>
+                <h2 className="section-title font-serif">Save the Date</h2>
+                <p className="section-subtitle text-muted">We hopen deze bijzondere dag met jullie te delen.</p>
                 <p className="cta-meta">{calendarDayDisplay} • Groot-Ammers</p>
                 <Button onClick={handleAddToCalendar} size="lg" className="btn-seal">
                   <Calendar className="h-5 w-5" />
-                  <span>{calendarLabel}</span>
+                  <span>Zet in agenda</span>
                 </Button>
                 <button type="button" className="back-to-top" onClick={handleBackToTop}>
                   <ArrowUp className="h-4 w-4" />
@@ -613,9 +676,56 @@ export function WeddingContent({ visible }: WeddingContentProps) {
         </main>
 
         <footer className="footer">
+          <button
+            type="button"
+            className="footer-link"
+            onClick={() => setIsCeremonyModalOpen(true)}
+            aria-haspopup="dialog"
+          >
+            Vragen? Contacteer de ceremoniemeesters
+          </button>
           <p>© 2026 Leonard &amp; Thirza - Made with love</p>
         </footer>
       </div>
+
+      {modalRoot && isCeremonyModalOpen
+        ? createPortal(
+            <div
+              className="modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Ceremoniemeesters"
+              onClick={() => setIsCeremonyModalOpen(false)}
+            >
+              <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+                <div className="modal-header">
+                  <h2 className="modal-title font-serif">Ceremoniemeesters</h2>
+                  <button
+                    type="button"
+                    className="modal-close"
+                    onClick={() => setIsCeremonyModalOpen(false)}
+                    aria-label="Sluiten"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p className="modal-intro">Voor vragen over de dag, speeches of verrassingen.</p>
+                <div className="modal-contacts">
+                  <a className="modal-link" href="tel:0618396917">
+                    Ilse Gouman – 06-18396917
+                  </a>
+                  <a className="modal-link" href="tel:0622265033">
+                    Marc Schippers – 06-22265033
+                  </a>
+                </div>
+                <p className="modal-note">
+                  Heb je allergieën of dieetwensen? Geef dit tijdig door aan Ilse of Marc.
+                </p>
+              </div>
+            </div>,
+            modalRoot,
+          )
+        : null}
 
       {SHOW_LEGACY_SAVE_THE_DATE ? (
         <LegacySaveTheDate
