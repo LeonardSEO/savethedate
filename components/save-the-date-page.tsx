@@ -16,6 +16,8 @@ export function SaveTheDatePage() {
     "idle" | "playing" | "fading" | "paper" | "revealing" | "done"
   >("idle")
   const introVideoRef = useRef<HTMLVideoElement>(null)
+  const [introVideoSrc, setIntroVideoSrc] = useState<string | null>(null)
+  const introBlobUrlRef = useRef<string | null>(null)
   const introFadeTimeoutRef = useRef<number | null>(null)
   const introPaperTimeoutRef = useRef<number | null>(null)
   const introRevealTimeoutRef = useRef<number | null>(null)
@@ -39,7 +41,34 @@ export function SaveTheDatePage() {
   }
 
   useEffect(() => {
+    let cancelled = false
+
+    const preloadIntroVideo = async () => {
+      try {
+        const response = await fetch("/kling_video.mp4")
+        if (!response.ok) {
+          throw new Error("Failed to preload intro video")
+        }
+        const blob = await response.blob()
+        if (cancelled) return
+        const url = URL.createObjectURL(blob)
+        introBlobUrlRef.current = url
+        setIntroVideoSrc(url)
+      } catch {
+        if (!cancelled) {
+          setIntroVideoSrc("/kling_video.mp4")
+        }
+      }
+    }
+
+    preloadIntroVideo()
+
     return () => {
+      cancelled = true
+      if (introBlobUrlRef.current) {
+        URL.revokeObjectURL(introBlobUrlRef.current)
+        introBlobUrlRef.current = null
+      }
       if (introFadeTimeoutRef.current !== null) {
         window.clearTimeout(introFadeTimeoutRef.current)
         introFadeTimeoutRef.current = null
@@ -118,11 +147,11 @@ export function SaveTheDatePage() {
             className={`intro-video ${introStatus === "fading" || introStatus === "paper" || introStatus === "revealing" ? "is-fading" : ""}`}
             playsInline
             webkit-playsinline="true"
-            preload="auto"
+            preload="metadata"
             muted
             poster="/envelop-start-frame.png"
           >
-            <source src="/kling_video.mp4" type="video/mp4" />
+            <source src={introVideoSrc ?? "/kling_video.mp4"} type="video/mp4" />
           </video>
           <div
             className={`intro-hit ${introStatus === "idle" ? "" : "is-hidden"}`}

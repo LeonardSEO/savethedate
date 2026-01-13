@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Playfair_Display } from "next/font/google"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 
@@ -58,7 +57,7 @@ export const metadata: Metadata = {
     ],
   },
   other: {
-    "apple-mobile-web-app-capable": "yes",
+    "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
     "apple-mobile-web-app-title": "Save the Date",
     "theme-color": "#f8f6f0",
@@ -77,7 +76,6 @@ export default function RootLayout({
       <head>
         <link rel="mask-icon" href="/clearer-golden-heart.png" color="#d1a954" />
         <link rel="preload" as="image" href="/envelop-start-frame.png" fetchPriority="high" />
-        <link rel="preload" as="video" href="/kling_video.mp4" type="video/mp4" />
         <meta name="color-scheme" content="light" />
         <meta name="theme-color" content="#faf9f6" />
         <script
@@ -105,7 +103,6 @@ export default function RootLayout({
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
         <Suspense fallback={null}>{children}</Suspense>
-        <Analytics />
       </body>
     </html>
   )
