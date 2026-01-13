@@ -33,7 +33,6 @@ const MAPS_DIRECTIONS_URL =
 const MAPS_PLACE_URL = "https://www.google.com/maps/place/Achterland+1a,+2964+LA+Groot-Ammers"
 const MAPS_EMBED_URL =
   "https://www.google.com/maps?q=Achterland+1a,+2964+LA+Groot-Ammers,+Nederland&output=embed"
-const SHOW_LEGACY_SAVE_THE_DATE = false
 const COUNTDOWN_TARGET = `${SAVE_THE_DATE}T12:00:00`
 
 const TIMELINE_ITEMS: { time: string; title: string; icon: LucideIcon }[] = [
@@ -59,200 +58,6 @@ const getCountdown = (targetDate: Date) => {
   return { days, hours, minutes }
 }
 
-const RingsIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <circle cx="8" cy="12" r="4" />
-    <circle cx="16" cy="12" r="4" />
-  </svg>
-)
-
-const CakeIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8" />
-    <path d="M3 18h18" />
-    <path d="M12 2v7" />
-    <path d="M8 2v7" />
-    <path d="M16 2v7" />
-  </svg>
-)
-
-const CalendarCard = () => {
-  const [shouldPulse, setShouldPulse] = useState(false)
-  const resetTimeoutRef = useRef<number | null>(null)
-
-  const highlightDate = useMemo(() => new Date(`${SAVE_THE_DATE}T00:00:00`), [])
-  const highlightDay = highlightDate.getDate()
-  const monthLabel = useMemo(
-    () =>
-      highlightDate
-        .toLocaleDateString("nl-NL", {
-          month: "long",
-          year: "numeric",
-        })
-        .toLocaleUpperCase("nl-NL"),
-    [highlightDate],
-  )
-  const weekdays = ["zo", "ma", "di", "wo", "do", "vr", "za"]
-  const daysInMonth = new Date(highlightDate.getFullYear(), highlightDate.getMonth() + 1, 0).getDate()
-  const firstDayOfMonth = new Date(highlightDate.getFullYear(), highlightDate.getMonth(), 1).getDay()
-
-  useEffect(() => {
-    const pulseTimeout = window.setTimeout(() => {
-      setShouldPulse(true)
-      resetTimeoutRef.current = window.setTimeout(() => setShouldPulse(false), 400)
-    }, 500)
-
-    return () => {
-      window.clearTimeout(pulseTimeout)
-      if (resetTimeoutRef.current !== null) {
-        window.clearTimeout(resetTimeoutRef.current)
-        resetTimeoutRef.current = null
-      }
-    }
-  }, [])
-
-  const calendarDays: (number | null)[] = Array(firstDayOfMonth).fill(null)
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    calendarDays.push(day)
-  }
-
-  return (
-    <div className="calendar-card mx-auto max-w-sm bg-white rounded-2xl shadow-soft p-4 relative overflow-hidden">
-      <div className="absolute top-2 left-2 opacity-15">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" className="text-gold">
-          <path d="M8 2l1.5 3h3.5l-2.5 2 1 3.5-3-2-3 2 1-3.5-2.5-2h3.5z" />
-        </svg>
-      </div>
-      <div className="absolute bottom-2 right-2 opacity-15">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-gold">
-          <path d="M6 1l1 2h2l-1.5 1.5.5 2.5-2-1-2 1 .5-2.5-1.5-1.5h2z" />
-        </svg>
-      </div>
-
-      <div className="text-center mb-4">
-        <h3 className="font-serif text-lg font-medium text-ink tracking-wide">{monthLabel}</h3>
-      </div>
-
-      <div className="grid grid-cols-7 gap-2 mb-2">
-        {weekdays.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-slate-500 uppercase tracking-wider py-1">
-            {day}
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-7 gap-2">
-        {calendarDays.map((day, index) => (
-          <div key={index} className="calendar-cell h-9 md:h-11 flex items-center justify-center relative">
-            {day && (
-              <>
-                <span
-                  className={`
-                    font-mono text-base md:text-lg font-medium text-ink
-                    ${day === highlightDay ? "relative z-10" : ""}
-                  `}
-                >
-                  {day}
-                </span>
-                {day === highlightDay && (
-                  <div
-                    className={`
-                      absolute inset-0 flex items-center justify-center z-0
-                      ${shouldPulse ? "animate-pulse-once" : ""}
-                    `}
-                  >
-                    <img src="/clearer-golden-heart.png" alt="Golden heart" className="w-48 h-48 object-contain" />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const LegacySaveTheDate = ({
-  calendarDayDisplay,
-  calendarLabel,
-  onAddToCalendar,
-}: {
-  calendarDayDisplay: string
-  calendarLabel: string
-  onAddToCalendar: () => void
-}) => (
-  <div className="min-h-screen">
-    <section className="relative px-4 py-16 md:py-24 lg:py-32 min-h-screen flex items-center">
-      <div className="mx-auto max-w-4xl text-center w-full relative">
-        <div className="mb-6 flex justify-center">
-          <RingsIcon className="h-8 w-8 text-gold-realistic" />
-        </div>
-
-        <h1 className="mb-2 font-serif text-4xl font-light tracking-wide text-ink md:text-5xl lg:text-6xl">
-          Save the Date
-        </h1>
-
-        <div className="mb-2">
-          <h2 className="font-serif text-3xl font-medium text-ink md:text-4xl lg:text-5xl">
-            Leonard <span className="text-gold-realistic">&</span> Thirza
-          </h2>
-        </div>
-
-        <div className="mb-8">
-          <p className="text-xl font-medium text-ink md:text-2xl">{calendarDayDisplay}</p>
-        </div>
-
-        <div className="mb-8 flex items-center justify-center">
-          <div className="flex-1 h-px bg-slate-200 max-w-24"></div>
-          <RingsIcon className="h-4 w-4 text-gold-realistic mx-4" />
-          <div className="flex-1 h-px bg-slate-200 max-w-24"></div>
-        </div>
-
-        <div className="mb-8">
-          <CalendarCard />
-        </div>
-
-        <div className="mb-8 relative z-20">
-          <Button onClick={onAddToCalendar} size="lg" className="btn-gold-realistic min-h-[44px] px-8 py-3 text-base font-medium">
-            <span className="shine"></span>
-            <Calendar className="mr-2 h-5 w-5 relative z-10" />
-            <span className="relative z-10">{calendarLabel}</span>
-          </Button>
-        </div>
-
-        <div className="mb-8 mx-auto" style={{ width: "80%", maxWidth: "320px" }}>
-          <div className="video-card bg-white rounded-2xl p-2 shadow-soft border-gold-realistic relative overflow-hidden">
-            <video
-              className="w-full h-full object-cover rounded-xl"
-              muted
-              loop
-              playsInline
-              poster="/wedding-video-poster.jpg"
-              style={{ aspectRatio: "4/5" }}
-            >
-              <source src={KISS_VIDEO_SRC} type="video/mp4" />
-            </video>
-            <div className="absolute inset-2 rounded-xl bg-linear-to-t from-white/20 via-transparent to-white/30 pointer-events-none"></div>
-          </div>
-        </div>
-
-        <p className="text-sm text-slate-600">Uitnodiging volgt later</p>
-      </div>
-    </section>
-
-    <footer className="relative px-4 py-8 text-center">
-      <div className="mx-auto max-w-2xl">
-        <div className="flex items-center justify-center gap-2 text-sm text-slate-600 mb-4">
-          <span>Meer informatie volgt via deze pagina</span>
-        </div>
-        <CakeIcon className="h-5 w-5 text-gold-realistic mx-auto" />
-      </div>
-    </footer>
-  </div>
-)
-
 export type WeddingContentProps = {
   visible: boolean
 }
@@ -266,7 +71,6 @@ export function WeddingContent({ visible }: WeddingContentProps) {
   const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null)
   const [reduceMotion, setReduceMotion] = useState(false)
   const [calendarType, setCalendarType] = useState<"google" | "ics" | "outlook">("google")
-  const [calendarLabel, setCalendarLabel] = useState("Zet in mijn agenda")
   const eventDate = useMemo(() => new Date(`${SAVE_THE_DATE}T15:00:00`), [])
   const heroDateStamp = useMemo(() => {
     const [year, month, day] = SAVE_THE_DATE.split("-")
@@ -318,30 +122,25 @@ export function WeddingContent({ visible }: WeddingContentProps) {
 
       if (/iphone|ipad|ipod/.test(userAgent) || (platform.includes("mac") && "ontouchend" in document)) {
         setCalendarType("ics")
-        setCalendarLabel("Zet in mijn agenda")
         return
       }
 
       if (/android/.test(userAgent)) {
         setCalendarType("google")
-        setCalendarLabel("Zet in mijn agenda")
         return
       }
 
       if (platform.includes("mac")) {
         setCalendarType("ics")
-        setCalendarLabel("Zet in mijn agenda")
         return
       }
 
       if (platform.includes("win")) {
         setCalendarType("outlook")
-        setCalendarLabel("Zet in mijn agenda")
         return
       }
 
       setCalendarType("google")
-      setCalendarLabel("Zet in mijn agenda")
     }
 
     detectDevice()
@@ -502,7 +301,6 @@ export function WeddingContent({ visible }: WeddingContentProps) {
               loop
               playsInline
               preload="metadata"
-              poster="/og-save-the-date-new.png"
             >
               <source src={STORY_VIDEO_SRC} type="video/mp4" />
             </video>
@@ -552,7 +350,6 @@ export function WeddingContent({ visible }: WeddingContentProps) {
                   loop
                   playsInline
                   preload="metadata"
-                  poster="/og-save-the-date-new.png"
                 >
                   <source src={KISS_VIDEO_SRC} type="video/mp4" />
                 </video>
@@ -727,13 +524,6 @@ export function WeddingContent({ visible }: WeddingContentProps) {
           )
         : null}
 
-      {SHOW_LEGACY_SAVE_THE_DATE ? (
-        <LegacySaveTheDate
-          calendarDayDisplay={calendarDayDisplay}
-          calendarLabel={calendarLabel}
-          onAddToCalendar={handleAddToCalendar}
-        />
-      ) : null}
     </>
   )
 }

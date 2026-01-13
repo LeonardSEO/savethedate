@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     description: "Bewaar 12 juni 2026 | Officiële uitnodiging volgt later",
     images: [
       {
-        url: "/og-save-the-date-new.png",
+        url: "/og-save-1200x630.jpg",
         width: 1200,
         height: 630,
         alt: "Save the Date - Leonard & Thirza - 12 juni 2026",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Save the Date - Leonard & Thirza",
     description: "Bewaar 12 juni 2026 | Officiële uitnodiging volgt later",
-    images: ["/og-save-the-date-new.png"],
+    images: ["/og-save-1200x630.jpg"],
   },
   icons: {
     icon: [
